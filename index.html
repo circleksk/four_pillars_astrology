@@ -9,27 +9,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
 let JP_ZODIAC = ["庚申","辛酉","壬戌","癸亥","甲子","乙丑","丙寅","丁卯","戊辰","己巳","庚午","辛未","壬申","癸酉","甲戌","乙亥","丙子","丁丑","戊寅","己卯","庚辰","辛巳","壬午","癸未","甲申","乙酉","丙戌","丁亥","戊子","己丑","庚寅","辛卯","壬辰","癸巳","甲午","乙未","丙申","丁酉","戊戌","己亥","庚子","辛丑","壬寅","癸卯","甲辰","乙巳","丙午","丁未","戊申","己酉","庚戌","辛亥","壬子","癸丑","甲寅","乙卯","丙辰","丁巳","戊午","己未"];
+let JP_24_DA = [ { d:6.3811, a:0.242778 }, { d:4.8693, a:0.242713 }, { d:6.3968, a:0.242512 }, { d:5.6280, a:0.242231 }, { d:6.3771, a:0.241945 }, { d:6.5733, a:0.241731 }, { d:8.0091, a:0.241642 }, { d:8.4102, a:0.241703 }, { d:8.5186, a:0.241898 }, { d:9.1414, a:0.242179 }, { d:8.2396, a:0.242469 }, { d:7.9152, a:0.242689 }, ];
+
 function isInvalidDate(date){
  return Number.isNaN(date.getTime());
 }
 function JS_CKSK_oracle(){
-	var zodiacYear = oracle_setting.year.value % 60;
-	var zodiacMonth = parseInt(oracle_setting.year.value) % 5;
-	var zodiacDay = 0;
-	zodiacMonth = zodiacMonth * 12
-	zodiacMonth = zodiacMonth + parseInt(oracle_setting.month.value);
-	zodiacMonth = zodiacMonth + 17;//配列の0が"庚申"になるように調整
-	zodiacMonth = zodiacMonth % 60;
-
-	var baseDate = new Date(1888, 2, 21);
-	var calcDate = new Date(oracle_setting.year.value, oracle_setting.month.value, oracle_setting.day.value);
-
+	var calcDate = new Date(oracle_setting.year.value, oracle_setting.month.value - 1, oracle_setting.day.value);
 	if(isInvalidDate(calcDate)){
 		alert("無効な日付です");
 		return false;
 	}
+	//年柱の計算
+	var zodiacYear = oracle_setting.year.value % 60;
+	//立春の日付
+	var intDateSetsu = Math.floor(JP_24_DA[1].d + ( JP_24_DA[1].a * ( oracle_setting.year.value-1901)) - Math.floor(( oracle_setting.year.value-1901)/4));
+	var calcRisshun = new Date(oracle_setting.year.value, 1, intDateSetsu);
+	if(calcDate < calcRisshun){
+		zodiacYear = (oracle_setting.year.value-1) % 60;
+	}
+	//月柱の計算
+	var zodiacMonth = parseInt(oracle_setting.year.value) % 5;
+	var zodiacDay = 0;
+	zodiacMonth = zodiacMonth * 12
+	zodiacMonth = zodiacMonth + parseInt(oracle_setting.month.value);
+	zodiacMonth = zodiacMonth + 16;//配列の0が"庚申"になるように調整
+	//節補正
+	var intMonth = oracle_setting.month.value - 1;
+	if (oracle_setting.month.value < 3) {
+		intDateSetsu = Math.floor(JP_24_DA[intMonth].d + ( JP_24_DA[intMonth].a * ( oracle_setting.year.value-1901)) - Math.floor(( oracle_setting.year.value-1901)/4));
+	} else {
+		intDateSetsu = Math.floor(JP_24_DA[intMonth].d + ( JP_24_DA[intMonth].a * ( oracle_setting.year.value-1900)) - Math.floor(( oracle_setting.year.value-1900)/4));
+	}
+	if ( oracle_setting.day.value < intDateSetsu ) {
+		zodiacMonth = zodiacMonth - 1;
+	}
+	zodiacMonth = zodiacMonth % 60;
+	//日柱の計算
+	var baseDate = new Date(1888, 1, 19);
 	var zodiacDay = ((calcDate - baseDate) / 86400000) % 60;
-
 	document.getElementById("pillars_year").innerText = "年柱：" + JP_ZODIAC[zodiacYear];
 	document.getElementById("pillars_month").innerText = "月柱：" + JP_ZODIAC[zodiacMonth];
 	document.getElementById("pillars_day").innerText = "日柱：" + JP_ZODIAC[zodiacDay];
@@ -40,9 +58,9 @@ function JS_CKSK_oracle(){
 </head>
 <body>
 <form name="oracle_setting">
-年<input type="text" maxlength=4 name="year" size=4 value="2022"><br/>
-月<input type="text" maxlength=2 name="month" size=2 value="1"><br/>
-日<input type="text" maxlength=2 name="day" size=2 value="7"><br/>
+年<input type="text" maxlength=4 name="year" size=4 value="1984"><br/>
+月<input type="text" maxlength=2 name="month" size=2 value="2"><br/>
+日<input type="text" maxlength=2 name="day" size=2 value="4"><br/>
 </form>
 <button onclick="JS_CKSK_oracle()">診断</button>
 <div id="pillars_year">年柱：</div>
@@ -50,4 +68,3 @@ function JS_CKSK_oracle(){
 <div id="pillars_day">日柱：</div>
 </body>
 </html>
-
