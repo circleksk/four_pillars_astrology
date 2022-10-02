@@ -14,6 +14,10 @@ let JP_24_DA = [ { d:6.3811, a:0.242778 }, { d:4.8693, a:0.242713 }, { d:6.3968,
 function isInvalidDate(date){
  return Number.isNaN(date.getTime());
 }
+
+function calcPillarsNum(zodiacIndex){
+	return ((zodiacIndex + 56) % 60) + 1;
+}
 function JS_CKSK_oracle(){
 	var calcDate = new Date(oracle_setting.year.value, oracle_setting.month.value - 1, oracle_setting.day.value);
 	if(isInvalidDate(calcDate)){
@@ -48,9 +52,14 @@ function JS_CKSK_oracle(){
 	//日柱の計算
 	var baseDate = new Date(1888, 1, 19);
 	var zodiacDay = ((calcDate - baseDate) / 86400000) % 60;
-	document.getElementById("pillars_year").innerText = "年柱：" + JP_ZODIAC[zodiacYear];
-	document.getElementById("pillars_month").innerText = "月柱：" + JP_ZODIAC[zodiacMonth];
-	document.getElementById("pillars_day").innerText = "日柱：" + JP_ZODIAC[zodiacDay];
+	document.getElementById("pillars_year").innerText =  JP_ZODIAC[zodiacYear];
+	document.getElementById("pillars_month").innerText = JP_ZODIAC[zodiacMonth];
+	document.getElementById("pillars_day").innerText = JP_ZODIAC[zodiacDay];
+
+	document.getElementById("pillars_year_num").innerText =  calcPillarsNum(zodiacYear);
+	document.getElementById("pillars_month_num").innerText = calcPillarsNum(zodiacMonth);
+	document.getElementById("pillars_day_num").innerText = calcPillarsNum(zodiacDay);
+
 }
 </script>
 <link rel="stylesheet" href="">
@@ -63,8 +72,57 @@ function JS_CKSK_oracle(){
 日<input type="text" maxlength=2 name="day" size=2 value="4"><br/>
 </form>
 <button onclick="JS_CKSK_oracle()">診断</button>
-<div id="pillars_year">年柱：</div>
-<div id="pillars_month">月柱：</div>
-<div id="pillars_day">日柱：</div>
+
+<table>
+<tr>
+	<td>天中殺</td>
+	<td>日柱</td>
+	<td>月柱</td>
+	<td>年柱</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td id="pillars_day"></td>
+	<td id="pillars_month"></td>
+	<td id="pillars_year"></td>
+	<td>干支</td>
+</tr>
+<tr>
+	<td></td>
+	<td id="pillars_day_num"></td>
+	<td id="pillars_month_num"></td>
+	<td id="pillars_year_num"></td>
+	<td>干支番号</td>
+</tr>
+<tr>
+	<td></td>
+	<td id=""></td>
+	<td id=""></td>
+	<td id=""></td>
+	<td>蔵干</td>
+</tr>
+<tr>
+	<td></td>
+	<td id=""></td>
+	<td id=""></td>
+	<td id=""></td>
+	<td>通変星</td>
+</tr>
+<tr>
+	<td></td>
+	<td id=""></td>
+	<td id=""></td>
+	<td id=""></td>
+	<td>十二運星</td>
+</tr>
+<tr>
+	<td></td>
+	<td id=""></td>
+	<td id=""></td>
+	<td id=""></td>
+	<td>運勢エネルギー</td>
+</tr>
+</table>
 </body>
 </html>
